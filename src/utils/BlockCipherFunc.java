@@ -1,8 +1,9 @@
 package utils;
 
 
-public class BlockCipherFunc
+class BlockCipherFunc
 {
+
     public static long cyclicRightShiftLong(long value, int n)
     {
         return (value >>> n) | (value << 64 - n);

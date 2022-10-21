@@ -1,62 +1,15 @@
 package utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Random;
 
 
-public class DataWork
+public class Mover
 {
-    private DataWork()
+
+    private Mover()
     {
         throw new AssertionError("This class is not meant to be instantiated");
     }
-
-    /**
-     * Reads a file byte by byte into an array of byte
-     *
-     * @param fileName the name of the file from which the bytes will be read
-     * @return array of bytes read from the file
-     * @throws IOException if no file with that name was found
-     *
-     */
-    public static byte[] readBitByteByteFromFile(String fileName) throws IOException
-    {
-        byte[] fileByBytesArr;
-
-        try(FileInputStream inputStream = new FileInputStream(fileName))
-        {
-            fileByBytesArr = new byte[inputStream.available()];
-            int bufferSize = 64_000;
-
-            if (inputStream.available() < bufferSize)
-                bufferSize = inputStream.available();
-            inputStream.read(fileByBytesArr, 0, bufferSize);
-        }
-        return fileByBytesArr;
-    }
-
-
-    /**
-     * Writes the given byte array in the file
-     *
-     * @param byteArr array of bytes to be written to the file
-     * @param fileName the name of the file where the bytes will be written to
-     * @throws IOException if no file with that name was found
-     *
-     */
-    public static void writeByteToFile(byte[] byteArr, String fileName) throws IOException
-    {
-        File outputFile = new File(fileName);
-        try (FileOutputStream outputStream = new FileOutputStream(outputFile))
-        {
-            outputStream.write(byteArr);
-        }
-    }
-
 
     /**
      * Writes the bits from the passed long to an array. The bits are written in the same order as in the long variable,
@@ -204,30 +157,5 @@ public class DataWork
             l = l >>> 8;
         }
         return resultArr;
-    }
-
-
-    /**
-     * Creates a new array equivalent to the original, but without elements at the end equal to 0
-     *
-     * @param message an array from which elements equal to 0 will be removed from the end
-     * @return an array equivalent to the original, but without elements at the end equal to 0
-     */
-    public static byte[] removeEmptyByteFromTheEnd(byte[] message)
-    {
-        int emptyByteCounter = 0;
-
-        for (int i = message.length - 1; i > -1; i--)
-        {
-            if (message[i] == 0)
-                emptyByteCounter++;
-            else
-                break;
-        }
-
-        byte[] messageWithoutAdded = new byte[message.length - emptyByteCounter];
-        System.arraycopy(message, 0, messageWithoutAdded, 0, message.length - emptyByteCounter);
-
-        return messageWithoutAdded;
     }
 }
