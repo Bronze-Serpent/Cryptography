@@ -1,87 +1,85 @@
-import containers.*;
-import utils.*;
+import utils.Cryptanalysis;
+import utils.Mover;
 
-import static utils.Algorithm.FEISTEL_CHAIN;
-import static utils.Mover.*;
-import static utils.Data.*;
-import static utils.Crypto.*;
-import static utils.Purpose.*;
-import static utils.Reformer.*;
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.io.*;
+import static utils.Cryptanalysis.*;
+import static utils.Cryptography.*;
+import static utils.Cryptography.calcHash;
 
 
 public class Application
 {
 
-    private static final String OPTIONS_FILENAME = "options.txt";
-
-
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args)
     {
-        ArgsCont argsCont = ArgParser.parseCmdArgs(args);
-        OptionsCont optsCont = Data.readOptionsFromFile(OPTIONS_FILENAME);
+        char[] alphabet = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
-        ArgParser.checkOptionsForAlg(optsCont, argsCont.getAlgorithm());
+        int mesSize = 14;
+        long numOfPairs = 6_100_000; // 10^(-6)% :)
 
-        long key = Long.parseLong(optsCont.get("key"));
-        long initVec = 0;
-        int rQ = 0;
-        if (optsCont.contains("rQ"))
-            rQ = Integer.parseInt(optsCont.get("rQ"));
-        if (argsCont.getAlgorithm() != FEISTEL_CHAIN)
-            initVec = Long.parseLong(optsCont.get("initVec"));
-
-        byte[] messageAsByteArr = readBitByteByteFromFile(argsCont.getInputFile());
-        long[] messageAsLongArr = bitsFromByteArrToLongArr(messageAsByteArr);
-
-        byte[] processedMessage;
-        if (argsCont.getWorkingMode() == ENCRYPT)
+        /*
+        Cryptanalysis.BirthdayAttackRez birthdayAttackRez = null;
+        int numOfIterations = 0;
+        while (birthdayAttackRez == null)
         {
-            long[] encryptedMessage = new long[0];
-
-            switch (argsCont.getAlgorithm())
-            {
-                case FEISTEL_CHAIN:
-                        if (optsCont.contains("rQ"))
-                            encryptedMessage = encryptMessageFN(messageAsLongArr, key, rQ);
-                        else
-                            encryptedMessage = encryptMessageFN(messageAsLongArr, key);
-                        break;
-
-                case CBC:
-                    if (optsCont.contains("rQ"))
-                        encryptedMessage = encryptMessageCBC(messageAsLongArr, key, initVec, rQ);
-                    else
-                        encryptedMessage = encryptMessageCBC(messageAsLongArr, key, initVec);
-                    break;
-            }
-            processedMessage = bitsFromLongArrToByteArr(encryptedMessage);
+            birthdayAttackRez = birthdayAttack(alphabet, mesSize, numOfPairs,
+                    m -> calcHash(m, 54321));
+            numOfIterations++;
         }
-        else
-        {
-            long[] decryptedMes = new long[0];
+         */
 
-            switch (argsCont.getAlgorithm())
-            {
-                case FEISTEL_CHAIN:
-                    if (optsCont.contains("rQ"))
-                        decryptedMes = decryptMessageFN(messageAsLongArr, key, rQ);
-                    else
-                        decryptedMes = decryptMessageFN(messageAsLongArr, key);
-                    break;
+        System.out.println("Хэш функция");
+        System.out.println("Значение общего хэшкода: " + calcHash("rybwwjpsbawqfj", 54321));
+        System.out.println("Сообщение 1: " + "rybwwjpsbawqfj");
+        System.out.println("Сообщение 2: " + "nrpwdihkfreqmq");
+        System.out.println("Количество итераций: " + "17");
 
-                case CBC:
-                    if (optsCont.contains("rQ"))
-                        decryptedMes = decryptMessageCBC(messageAsLongArr, key, initVec, rQ);
-                    else
-                        decryptedMes = decryptMessageCBC(messageAsLongArr, key, initVec);
-                    break;
-            }
-            processedMessage = removeEmptyByteFromTheEnd(bitsFromLongArrToByteArr(decryptedMes));
-        }
+        BigInteger oKeyN = new BigInteger("889577666850907");
+        BigInteger oKeyE = new BigInteger("13971");
+        String cipherText = "403013074606912545180648978557219641194372024501606729868202878976557455422";
 
-        writeByteToFile(processedMessage, argsCont.getOutputFile());
+        BigInteger sKey = calcSKeyRSA(oKeyN, oKeyE);
+        List<Character> message = parseMessageRSA(decryptRSA(parseCipherTextRSA(cipherText, oKeyN), sKey, oKeyN));
+
+        System.out.println("\nRSA");
+        System.out.print("Расшифрованное сообщение: ");
+        message.forEach(System.out::print);
+
     }
 
+
+    private static List<Character> parseMessageRSA(List<BigInteger> message)
+    {
+        List<Character> symbolsASCII = new LinkedList<>();
+
+        for (BigInteger mes : message)
+        {
+            int startIndex = 0;
+
+            while(true)
+            {
+                int mesLength = mes.toString().length();
+
+                if ( mesLength < startIndex + 2)
+                {
+                    if (mesLength == startIndex)
+                        break;
+
+                    symbolsASCII.add((char) Integer.parseInt(mes.toString().substring(startIndex, mesLength)));
+                    break;
+                }
+                else
+                {
+                    symbolsASCII.add((char) Integer.parseInt(mes.toString().substring(startIndex, startIndex + 2)));
+                    startIndex += 2;
+                }
+            }
+        }
+
+        return symbolsASCII;
+    }
 }

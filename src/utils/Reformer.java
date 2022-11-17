@@ -1,7 +1,7 @@
 package utils;
 
 
-public class Reformer
+class Reformer
 {
 
     private Reformer()
