@@ -59,7 +59,7 @@ public class Cryptanalysis
 
         for (int i = 0; i < numOfPairs; i++)
         {
-            String randomMes = RandomMessage.getMessage(alphabet, mesSize);
+            String randomMes = RndMessager.getMessage(alphabet, mesSize);
             long mesHash = hashFunk.applyAsLong(randomMes);
 
             if (mHPairs.containsKey(mesHash) && !mHPairs.get(mesHash).equals(randomMes))

@@ -21,7 +21,7 @@ public class Data
      * @throws IOException if no file with that name was found
      *
      */
-    public static byte[] readBitByteByteFromFile(String fileName) throws IOException
+    public static byte[] readBytesFromFile(String fileName) throws IOException
     {
         byte[] fileByBytesArr;
 

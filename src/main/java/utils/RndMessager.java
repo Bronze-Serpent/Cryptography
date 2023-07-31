@@ -3,7 +3,7 @@ package utils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-class RandomMessage
+class RndMessager
 {
     /**
      * Generates a message of size mesSize, consisting of characters from alphabet
